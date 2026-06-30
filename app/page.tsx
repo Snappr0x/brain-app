@@ -13,6 +13,7 @@ export default function Home() {
   const [notes, setNotes] = useState<Note[]>([])
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -21,6 +22,20 @@ export default function Home() {
 
   const fetchNotes = async () => {
     const res = await fetch('/api/notes')
+    const data = await res.json()
+    setNotes(data)
+  }
+
+  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value
+    setSearchQuery(query)
+
+    if (!query.trim()) {
+      fetchNotes()
+      return
+    }
+
+    const res = await fetch(`/api/notes/search?q=${encodeURIComponent(query)}`)
     const data = await res.json()
     setNotes(data)
   }
@@ -37,19 +52,35 @@ export default function Home() {
     })
     setTitle('')
     setContent('')
+    setSearchQuery('')
     fetchNotes()
     setLoading(false)
   }
 
   const handleDelete = async (id: number) => {
     await fetch(`/api/notes/${id}`, { method: 'DELETE' })
-    fetchNotes()
+    if (searchQuery.trim()) {
+      handleSearch({ target: { value: searchQuery } } as any)
+    } else {
+      fetchNotes()
+    }
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-8">Brain App</h1>
+
+        {/* Recherche */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Rechercher notes..."
+            value={searchQuery}
+            onChange={handleSearch}
+            className="w-full p-3 bg-slate-700 text-white rounded border border-slate-500 focus:outline-none focus:border-blue-500"
+          />
+        </div>
 
         {/* Formulaire création */}
         <form onSubmit={handleCreate} className="mb-8 bg-slate-700 p-6 rounded-lg">
