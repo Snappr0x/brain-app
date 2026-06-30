@@ -40,6 +40,7 @@ export default function Home() {
   const [editingNoteId, setEditingNoteId] = useState<number | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editContent, setEditContent] = useState('')
+  const [isDarkMode, setIsDarkMode] = useState(true)
 
   useEffect(() => {
     fetchNotes()
@@ -185,32 +186,55 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-8">
+    <div style={{ backgroundColor: '#0B162C' }} className="min-h-screen p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-white">Brain App</h1>
-          <Link href="/graph" className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded font-medium">
-            Graphe
-          </Link>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-12">
+          <div>
+            <h1 className="text-5xl font-bold text-white mb-2">Brain App</h1>
+            <p style={{ color: '#3B556D' }} className="text-sm">Digital second brain</p>
+          </div>
+          <div className="flex gap-4">
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              style={{ 
+                backgroundColor: '#1C2942',
+                borderColor: '#3B556D',
+                color: '#5FC2BA'
+              }}
+              className="px-4 py-2 rounded-lg border text-lg hover:opacity-80 transition"
+            >
+              {isDarkMode ? '☀️' : '🌙'}
+            </button>
+            <Link 
+              href="/graph"
+              style={{ backgroundColor: '#5FC2BA' }}
+              className="px-6 py-2 rounded-lg text-black font-medium hover:opacity-90 transition"
+            >
+              Graphe
+            </Link>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar tags */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* Sidebar Tags */}
           <div className="lg:col-span-1">
-            <div className="bg-slate-700 p-6 rounded-lg sticky top-8">
-              <h2 className="text-xl font-bold text-white mb-4">Tags</h2>
+            <div style={{ backgroundColor: '#1C2942', borderColor: '#3B556D' }} className="p-6 rounded-xl border sticky top-8">
+              <h2 className="text-xl font-bold text-white mb-6">Tags</h2>
               
-              <form onSubmit={handleCreateTag} className="mb-4">
+              <form onSubmit={handleCreateTag} className="mb-6">
                 <input
                   type="text"
-                  placeholder="Nouveau tag..."
+                  placeholder="Nouveau tag"
                   value={newTagLabel}
                   onChange={(e) => setNewTagLabel(e.target.value)}
-                  className="w-full mb-2 p-2 bg-slate-600 text-white text-sm rounded border border-slate-500 focus:outline-none focus:border-blue-500"
+                  style={{ backgroundColor: '#0B162C', borderColor: '#3B556D' }}
+                  className="w-full mb-3 p-3 rounded-lg border text-white text-sm placeholder-gray-500 focus:outline-none focus:border-teal-400 transition"
                 />
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium"
+                  style={{ backgroundColor: '#5FC2BA' }}
+                  className="w-full text-black px-4 py-2 rounded-lg font-medium hover:opacity-90 transition text-sm"
                 >
                   Ajouter
                 </button>
@@ -218,13 +242,13 @@ export default function Home() {
 
               <div className="space-y-2">
                 {tags.map((tag) => (
-                  <div key={tag.id} className="flex justify-between items-center bg-slate-600 p-2 rounded">
+                  <div key={tag.id} style={{ backgroundColor: '#0B162C', borderColor: '#3B556D' }} className="flex justify-between items-center p-3 rounded-lg border group">
                     <span className="text-white text-sm">{tag.label}</span>
                     <button
                       onClick={() => fetchTags()}
-                      className="text-red-400 hover:text-red-300 text-xs"
+                      className="text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition text-sm"
                     >
-                      ×
+                      ✕
                     </button>
                   </div>
                 ))}
@@ -232,37 +256,40 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Main content */}
-          <div className="lg:col-span-3">
-            {/* Recherche */}
-            <div className="mb-6">
+          {/* Main Content */}
+          <div className="lg:col-span-4">
+            {/* Search */}
+            <div className="mb-8">
               <input
                 type="text"
                 placeholder="Rechercher notes..."
                 value={searchQuery}
                 onChange={handleSearch}
-                className="w-full p-3 bg-slate-700 text-white rounded border border-slate-500 focus:outline-none focus:border-blue-500"
+                style={{ backgroundColor: '#1C2942', borderColor: '#3B556D' }}
+                className="w-full p-4 rounded-xl border text-white placeholder-gray-500 focus:outline-none focus:border-teal-400 transition"
               />
             </div>
 
-            {/* Formulaire création */}
-            <form onSubmit={handleCreate} className="mb-8 bg-slate-700 p-6 rounded-lg">
+            {/* Create Form */}
+            <form onSubmit={handleCreate} style={{ backgroundColor: '#1C2942', borderColor: '#3B556D' }} className="mb-8 p-8 rounded-xl border">
               <input
                 type="text"
-                placeholder="Titre..."
+                placeholder="Titre"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full mb-4 p-3 bg-slate-600 text-white rounded border border-slate-500 focus:outline-none focus:border-blue-500"
+                style={{ backgroundColor: '#0B162C', borderColor: '#3B556D' }}
+                className="w-full mb-4 p-4 rounded-lg border text-white placeholder-gray-500 focus:outline-none focus:border-teal-400 transition"
               />
               <textarea
-                placeholder="Contenu..."
+                placeholder="Contenu"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="w-full mb-4 p-3 bg-slate-600 text-white rounded border border-slate-500 focus:outline-none focus:border-blue-500 h-32"
+                style={{ backgroundColor: '#0B162C', borderColor: '#3B556D' }}
+                className="w-full mb-4 p-4 rounded-lg border text-white placeholder-gray-500 focus:outline-none focus:border-teal-400 transition h-32"
               />
               
-              <div className="mb-4">
-                <label className="text-white text-sm mb-2 block">Tags</label>
+              <div className="mb-6">
+                <label className="text-white text-sm mb-3 block font-medium">Tags</label>
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag) => (
                     <button
@@ -275,11 +302,12 @@ export default function Home() {
                             : [...selectedTags, tag.id]
                         )
                       }
-                      className={`px-3 py-1 rounded text-sm font-medium transition ${
-                        selectedTags.includes(tag.id)
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
-                      }`}
+                      style={{
+                        backgroundColor: selectedTags.includes(tag.id) ? '#5FC2BA' : '#0B162C',
+                        borderColor: '#3B556D',
+                        color: selectedTags.includes(tag.id) ? '#000' : '#5FC2BA'
+                      }}
+                      className="px-3 py-1 rounded-lg text-sm font-medium border transition"
                     >
                       {tag.label}
                     </button>
@@ -290,59 +318,63 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-medium disabled:opacity-50"
+                style={{ backgroundColor: '#5FC2BA' }}
+                className="text-black px-6 py-3 rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50"
               >
                 {loading ? 'Création...' : 'Créer note'}
               </button>
             </form>
 
-            {/* Liste notes */}
-            <div className="grid gap-4">
+            {/* Notes List */}
+            <div className="space-y-4">
               {notes.map((note) => (
-                <div key={note.id} className="bg-slate-700 p-6 rounded-lg">
+                <div key={note.id} style={{ backgroundColor: '#1C2942', borderColor: '#3B556D' }} className="p-6 rounded-xl border">
                   {editingNoteId === note.id ? (
-                    // Mode édition
                     <div>
                       <input
                         type="text"
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
-                        className="w-full mb-4 p-3 bg-slate-600 text-white rounded border border-slate-500 focus:outline-none focus:border-blue-500 text-xl font-bold"
+                        style={{ backgroundColor: '#0B162C', borderColor: '#3B556D' }}
+                        className="w-full mb-4 p-4 rounded-lg border text-white text-xl font-bold focus:outline-none focus:border-teal-400 transition"
                       />
                       <textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
-                        className="w-full mb-4 p-3 bg-slate-600 text-white rounded border border-slate-500 focus:outline-none focus:border-blue-500 h-32"
+                        style={{ backgroundColor: '#0B162C', borderColor: '#3B556D' }}
+                        className="w-full mb-4 p-4 rounded-lg border text-white focus:outline-none focus:border-teal-400 transition h-32"
                       />
-                      <div className="flex gap-2">
+                      <div className="flex gap-3">
                         <button
                           onClick={() => handleSaveEdit(note.id)}
-                          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-medium"
+                          style={{ backgroundColor: '#5FC2BA' }}
+                          className="text-black px-4 py-2 rounded-lg font-medium hover:opacity-90 transition"
                         >
                           Enregistrer
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded font-medium"
+                          style={{ backgroundColor: '#0B162C', borderColor: '#3B556D', color: '#FFFFFF' }}
+                          className="px-4 py-2 rounded-lg border font-medium hover:opacity-80 transition"
                         >
                           Annuler
                         </button>
                       </div>
                     </div>
                   ) : (
-                    // Mode affichage
                     <>
-                      <div className="flex justify-between items-start mb-2">
-                        <h2 className="text-xl font-bold text-white flex-1">{note.title}</h2>
+                      <div className="flex justify-between items-start mb-4">
+                        <h2 className="text-2xl font-bold text-white flex-1">{note.title}</h2>
                         <button
                           onClick={() => setExpandedNoteId(expandedNoteId === note.id ? null : note.id)}
-                          className="text-blue-400 hover:text-blue-300 text-sm"
+                          style={{ color: '#5FC2BA' }}
+                          className="text-lg hover:opacity-80 transition"
                         >
                           {expandedNoteId === note.id ? '▼' : '▶'}
                         </button>
                       </div>
                       
-                      <p className="text-slate-300 mb-4">{note.content}</p>
+                      <p className="text-gray-300 mb-4">{note.content}</p>
                       
                       {/* Tags */}
                       <div className="mb-4 flex flex-wrap gap-2">
@@ -350,14 +382,15 @@ export default function Home() {
                           <button
                             key={tag.id}
                             onClick={() => handleRemoveTagFromNote(note.id, tag.id)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                            style={{ backgroundColor: '#5FC2BA' }}
+                            className="text-black px-3 py-1 rounded-lg text-sm hover:opacity-80 transition"
                           >
-                            {tag.label} ×
+                            {tag.label} ✕
                           </button>
                         ))}
                       </div>
 
-                      {/* Ajouter tags disponibles */}
+                      {/* Add tags */}
                       {tags.length > note.tags.length && (
                         <div className="mb-4">
                           <div className="flex flex-wrap gap-2">
@@ -367,7 +400,8 @@ export default function Home() {
                                 <button
                                   key={tag.id}
                                   onClick={() => handleAddTagToNote(note.id, tag.id)}
-                                  className="bg-slate-600 hover:bg-slate-500 text-slate-300 px-2 py-1 rounded text-xs"
+                                  style={{ backgroundColor: '#0B162C', borderColor: '#3B556D', color: '#5FC2BA' }}
+                                  className="px-2 py-1 rounded-lg text-xs border hover:opacity-80 transition"
                                 >
                                   + {tag.label}
                                 </button>
@@ -376,31 +410,31 @@ export default function Home() {
                         </div>
                       )}
 
-                      {/* Liens bidirectionnels */}
+                      {/* Links */}
                       {expandedNoteId === note.id && (
-                        <div className="mt-4 pt-4 border-t border-slate-600">
-                          <h3 className="text-white font-bold mb-2">Liens</h3>
+                        <div style={{ borderColor: '#3B556D' }} className="mt-6 pt-6 border-t">
+                          <h3 className="text-white font-bold mb-4">Liens</h3>
                           
-                          {/* Afficher liens existants */}
                           {getLinkedNotes(note).length > 0 && (
                             <div className="mb-4">
-                              <p className="text-slate-400 text-sm mb-2">Connecté à :</p>
-                              <div className="space-y-1">
+                              <p style={{ color: '#3B556D' }} className="text-sm mb-3">Connecté à :</p>
+                              <div className="space-y-2">
                                 {getLinkedNotes(note).map((linkedId) => {
                                   const linkedNote = notes.find((n) => n.id === linkedId)
                                   return (
-                                    <div key={linkedId} className="flex justify-between items-center bg-slate-600 p-2 rounded text-sm">
+                                    <div key={linkedId} style={{ backgroundColor: '#0B162C', borderColor: '#3B556D' }} className="flex justify-between items-center p-3 rounded-lg border">
                                       <button
                                         onClick={() => setExpandedNoteId(linkedId)}
-                                        className="text-blue-400 hover:text-blue-300 text-left"
+                                        style={{ color: '#5FC2BA' }}
+                                        className="text-left hover:opacity-80 transition"
                                       >
                                         {linkedNote?.title}
                                       </button>
                                       <button
                                         onClick={() => handleRemoveLink(note.id, linkedId)}
-                                        className="text-red-400 hover:text-red-300"
+                                        className="text-gray-500 hover:text-red-400 transition"
                                       >
-                                        ×
+                                        ✕
                                       </button>
                                     </div>
                                   )
@@ -409,18 +443,18 @@ export default function Home() {
                             </div>
                           )}
 
-                          {/* Ajouter liens */}
                           {linkingFromId === note.id ? (
                             <div>
-                              <p className="text-slate-400 text-sm mb-2">Lier vers :</p>
-                              <div className="space-y-1 max-h-48 overflow-y-auto">
+                              <p style={{ color: '#3B556D' }} className="text-sm mb-3">Lier vers :</p>
+                              <div className="space-y-2 max-h-48 overflow-y-auto">
                                 {notes
                                   .filter((n) => n.id !== note.id && !getLinkedNotes(note).includes(n.id))
                                   .map((targetNote) => (
                                     <button
                                       key={targetNote.id}
                                       onClick={() => handleAddLink(note.id, targetNote.id)}
-                                      className="w-full text-left bg-slate-600 hover:bg-slate-500 p-2 rounded text-sm text-slate-300"
+                                      style={{ backgroundColor: '#0B162C', borderColor: '#3B556D', color: '#5FC2BA' }}
+                                      className="w-full text-left p-3 rounded-lg border text-sm hover:opacity-80 transition"
                                     >
                                       {targetNote.title}
                                     </button>
@@ -428,7 +462,8 @@ export default function Home() {
                               </div>
                               <button
                                 onClick={() => setLinkingFromId(null)}
-                                className="mt-2 text-slate-400 hover:text-slate-300 text-xs"
+                                style={{ color: '#3B556D' }}
+                                className="mt-3 text-xs hover:text-gray-400 transition"
                               >
                                 Annuler
                               </button>
@@ -436,7 +471,8 @@ export default function Home() {
                           ) : (
                             <button
                               onClick={() => setLinkingFromId(note.id)}
-                              className="bg-slate-600 hover:bg-slate-500 text-slate-300 px-3 py-1 rounded text-sm"
+                              style={{ backgroundColor: '#0B162C', borderColor: '#3B556D', color: '#5FC2BA' }}
+                              className="px-3 py-2 rounded-lg border text-sm hover:opacity-80 transition"
                             >
                               + Ajouter lien
                             </button>
@@ -445,18 +481,19 @@ export default function Home() {
                       )}
 
                       {/* Actions */}
-                      <div className="flex justify-between items-center text-sm text-slate-400 mt-4">
+                      <div style={{ borderColor: '#3B556D', color: '#3B556D' }} className="flex justify-between items-center text-sm mt-6 pt-6 border-t">
                         <span>{new Date(note.createdAt).toLocaleDateString('fr-FR')}</span>
-                        <div className="space-x-2">
+                        <div className="space-x-4">
                           <button
                             onClick={() => handleEditNote(note)}
-                            className="text-blue-400 hover:text-blue-300"
+                            style={{ color: '#5FC2BA' }}
+                            className="hover:opacity-80 transition"
                           >
                             Éditer
                           </button>
                           <button
                             onClick={() => handleDelete(note.id)}
-                            className="text-red-500 hover:text-red-400"
+                            className="text-red-500 hover:text-red-400 transition"
                           >
                             Supprimer
                           </button>
@@ -469,7 +506,7 @@ export default function Home() {
             </div>
 
             {notes.length === 0 && (
-              <div className="text-center text-slate-400 mt-8">
+              <div style={{ color: '#3B556D' }} className="text-center mt-12">
                 Aucune note. Crée la première !
               </div>
             )}
