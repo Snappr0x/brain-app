@@ -17,7 +17,11 @@ export async function GET(req: NextRequest) {
           { tags: { some: { label: { contains: query, mode: 'insensitive' } } } },
         ],
       },
-      include: { tags: true },
+      include: { 
+        tags: true,
+        linksFrom: { include: { to: true } },
+        linksTo: { include: { from: true } },
+      },
       orderBy: { createdAt: 'desc' },
     })
 

@@ -7,11 +7,21 @@ interface Tag {
   label: string
 }
 
+interface NoteLink {
+  id: number
+  fromId: number
+  toId: number
+  from?: Note
+  to?: Note
+}
+
 interface Note {
   id: number
   title: string
   content: string
   tags: Tag[]
+  linksFrom: NoteLink[]
+  linksTo: NoteLink[]
   createdAt: string
 }
 
@@ -24,7 +34,8 @@ export default function Home() {
   const [newTagLabel, setNewTagLabel] = useState('')
   const [selectedTags, setSelectedTags] = useState<number[]>([])
   const [loading, setLoading] = useState(false)
-  const [editingNoteId, setEditingNoteId] = useState<number | null>(null)
+  const [expandedNoteId, setExpandedNoteId] = useState<number | null>(null)
+  const [linkingFromId, setLinkingFromId] = useState<number | null>(null)
 
   useEffect(() => {
     fetchNotes()
@@ -88,6 +99,25 @@ export default function Home() {
     fetchNotes()
   }
 
+  const handleAddLink = async (fromId: number, toId: number) => {
+    await fetch(`/api/notes/${fromId}/links`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ toId }),
+    })
+    setLinkingFromId(null)
+    fetchNotes()
+  }
+
+  const handleRemoveLink = async (fromId: number, toId: number) => {
+    await fetch(`/api/notes/${fromId}/links`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ toId }),
+    })
+    fetchNotes()
+  }
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!title.trim() || !content.trim()) return
@@ -100,7 +130,6 @@ export default function Home() {
     })
     const newNote = await res.json()
 
-    // Add selected tags to note
     for (const tagId of selectedTags) {
       await handleAddTagToNote(newNote.id, tagId)
     }
@@ -120,6 +149,13 @@ export default function Home() {
     } else {
       fetchNotes()
     }
+  }
+
+  const getLinkedNotes = (note: Note) => {
+    const linked = new Set<number>()
+    note.linksFrom.forEach((link) => linked.add(link.toId))
+    note.linksTo.forEach((link) => linked.add(link.fromId))
+    return Array.from(linked)
   }
 
   return (
@@ -233,10 +269,19 @@ export default function Home() {
             <div className="grid gap-4">
               {notes.map((note) => (
                 <div key={note.id} className="bg-slate-700 p-6 rounded-lg">
-                  <h2 className="text-xl font-bold text-white mb-2">{note.title}</h2>
+                  <div className="flex justify-between items-start mb-2">
+                    <h2 className="text-xl font-bold text-white flex-1">{note.title}</h2>
+                    <button
+                      onClick={() => setExpandedNoteId(expandedNoteId === note.id ? null : note.id)}
+                      className="text-blue-400 hover:text-blue-300 text-sm"
+                    >
+                      {expandedNoteId === note.id ? '▼' : '▶'}
+                    </button>
+                  </div>
+                  
                   <p className="text-slate-300 mb-4">{note.content}</p>
                   
-                  {/* Tags sur la note */}
+                  {/* Tags */}
                   <div className="mb-4 flex flex-wrap gap-2">
                     {note.tags.map((tag) => (
                       <button
@@ -268,7 +313,76 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="flex justify-between items-center text-sm text-slate-400">
+                  {/* Liens bidirectionnels */}
+                  {expandedNoteId === note.id && (
+                    <div className="mt-4 pt-4 border-t border-slate-600">
+                      <h3 className="text-white font-bold mb-2">Liens</h3>
+                      
+                      {/* Afficher liens existants */}
+                      {getLinkedNotes(note).length > 0 && (
+                        <div className="mb-4">
+                          <p className="text-slate-400 text-sm mb-2">Connecté à :</p>
+                          <div className="space-y-1">
+                            {getLinkedNotes(note).map((linkedId) => {
+                              const linkedNote = notes.find((n) => n.id === linkedId)
+                              return (
+                                <div key={linkedId} className="flex justify-between items-center bg-slate-600 p-2 rounded text-sm">
+                                  <button
+                                    onClick={() => setExpandedNoteId(linkedId)}
+                                    className="text-blue-400 hover:text-blue-300 text-left"
+                                  >
+                                    {linkedNote?.title}
+                                  </button>
+                                  <button
+                                    onClick={() => handleRemoveLink(note.id, linkedId)}
+                                    className="text-red-400 hover:text-red-300"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Ajouter liens */}
+                      {linkingFromId === note.id ? (
+                        <div>
+                          <p className="text-slate-400 text-sm mb-2">Lier vers :</p>
+                          <div className="space-y-1 max-h-48 overflow-y-auto">
+                            {notes
+                              .filter((n) => n.id !== note.id && !getLinkedNotes(note).includes(n.id))
+                              .map((targetNote) => (
+                                <button
+                                  key={targetNote.id}
+                                  onClick={() => handleAddLink(note.id, targetNote.id)}
+                                  className="w-full text-left bg-slate-600 hover:bg-slate-500 p-2 rounded text-sm text-slate-300"
+                                >
+                                  {targetNote.title}
+                                </button>
+                              ))}
+                          </div>
+                          <button
+                            onClick={() => setLinkingFromId(null)}
+                            className="mt-2 text-slate-400 hover:text-slate-300 text-xs"
+                          >
+                            Annuler
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setLinkingFromId(note.id)}
+                          className="bg-slate-600 hover:bg-slate-500 text-slate-300 px-3 py-1 rounded text-sm"
+                        >
+                          + Ajouter lien
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex justify-between items-center text-sm text-slate-400 mt-4">
                     <span>{new Date(note.createdAt).toLocaleDateString('fr-FR')}</span>
                     <button
                       onClick={() => handleDelete(note.id)}

@@ -10,7 +10,11 @@ export async function GET(
     const { id } = await params
     const note = await prisma.note.findUnique({
       where: { id: parseInt(id) },
-      include: { tags: true },
+      include: { 
+        tags: true,
+        linksFrom: { include: { to: true } },
+        linksTo: { include: { from: true } },
+      },
     })
     if (!note) return NextResponse.json({ error: 'Note not found' }, { status: 404 })
     return NextResponse.json(note)
@@ -30,7 +34,11 @@ export async function PUT(
     const note = await prisma.note.update({
       where: { id: parseInt(id) },
       data: { title, content },
-      include: { tags: true },
+      include: { 
+        tags: true,
+        linksFrom: { include: { to: true } },
+        linksTo: { include: { from: true } },
+      },
     })
     return NextResponse.json(note)
   } catch (error) {
