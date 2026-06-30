@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function GET() {
   try {
     const notes = await prisma.note.findMany({
+      include: { tags: true },
       orderBy: { createdAt: 'desc' },
     })
     return NextResponse.json(notes)
@@ -19,6 +20,7 @@ export async function POST(req: NextRequest) {
     const { title, content } = await req.json()
     const note = await prisma.note.create({
       data: { title, content },
+      include: { tags: true },
     })
     return NextResponse.json(note, { status: 201 })
   } catch (error) {

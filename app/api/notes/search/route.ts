@@ -14,8 +14,10 @@ export async function GET(req: NextRequest) {
         OR: [
           { title: { contains: query, mode: 'insensitive' } },
           { content: { contains: query, mode: 'insensitive' } },
+          { tags: { some: { label: { contains: query, mode: 'insensitive' } } } },
         ],
       },
+      include: { tags: true },
       orderBy: { createdAt: 'desc' },
     })
 
